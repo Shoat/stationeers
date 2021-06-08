@@ -1,0 +1,28 @@
+# Perfect fuel mixer
+
+# IC pins
+alias pipe_analyser_h2 d0
+alias pipe_analyser_o2 d1
+alias gas_mixer d2
+
+# Internal Variables
+alias h2_adjusted_ratio r0
+alias temp_h2 r1
+alias temp_o2 r2
+
+# Main execution
+loop:
+# Read in temperatures
+l temp_h2 pipe_analyser_h2 Temperature
+l temp_o2 pipe_analyser_o2 Temperature
+
+# fuel ratio: 100/(1+o2.temp/(2*h2.temp))
+mul r3 temp_h2 2
+div r4 temp_o2 r3
+add r5 r4 1
+div h2_adjusted_ratio 100 r5
+
+s gas_mixer Setting h2_adjusted_ratio
+
+yield
+j loop
