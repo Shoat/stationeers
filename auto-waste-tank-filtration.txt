@@ -1,0 +1,35 @@
+# Automated waste tank filtration
+
+# This is your desired pressure in kPa
+define max_pressure 1000
+define min_pressure 100
+
+# IC pins
+alias in_pipe_analyser d0
+
+# Internal Variables
+define filtration -348054045
+alias curr_pressure r0
+alias filtration_status r1
+
+# Main execution
+loop:
+# Read in pressure and status
+l curr_pressure in_pipe_analyser Pressure
+lb filtration_status filtration On 1
+
+# if the filtration is on
+beqz filtration_status filter_off
+# if pressure < min, turn off all filters
+bgt curr_pressure min_pressure end_loop
+sb filtration On 0
+j end_loop
+
+filter_off:
+# if pressure > max, turn on all filters
+blt curr_pressure max_pressure end_loop
+sb filtration On 1
+
+end_loop:
+yield
+j loop

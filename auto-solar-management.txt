@@ -1,0 +1,74 @@
+# Automated solar angle and backup generator
+
+# High and low watermark for starting generator
+define min_stored_power 1000
+define max_stored_power 2000
+
+# IC Pins
+alias in_daylight_sensor d0
+alias inout_generator d1
+alias out_warning_light d2
+
+define solar_panel_hash -2045627372
+define station_battery_hash -400115994
+define lg_station_battery_hash -1388288459
+
+alias solar_angle r0
+alias cos_sa r1
+alias mult_cos_sa r2
+alias sub_mult_cos_sa r3
+alias formula_result r4
+alias result r5
+
+alias total_sm_batt r6
+alias total_lg_batt r7
+alias total_stored_power r8
+alias generator_state r9
+
+# MIN((((sa) - 13.5cos(sa)) / 1.8), 100)
+
+loop:
+# read in solar angle
+l solar_angle in_daylight_sensor SolarAngle
+
+# cos(sa)
+cos cos_sa solar_angle
+
+# 13.5cos(sa)
+mul mult_cos_sa cos_sa 13.5
+
+# sa - 13.5cos(sa)
+sub sub_mult_cos_sa solar_angle mult_cos_sa
+
+# ((sa) - 13.5cos(sa)) / 1.8)
+div formula_result sub_mult_cos_sa 1.8
+
+# MIN(..., 100)
+min result formula_result 100
+
+# batch write this out
+sb solar_panel_hash Vertical result
+
+# now check stored battery level
+lb total_sm_batt station_battery_hash Charge 1
+lb total_lg_batt lg_station_battery_hash Charge 1
+add total_stored_power total_sm_batt total_lg_batt
+l generator_state inout_generator On
+
+# if the generator is currently on
+beqz generator_state gen_off
+# if total > max, turn off generator
+blt total_stored_power max_stored_power end_loop
+s inout_generator On 0
+s out_warning_light On 0
+j end_loop
+
+gen_off:
+# if total < min, turn on generator
+bgt total_stored_power min_stored_power end_loop
+s inout_generator On 1
+s out_warning_light On 1
+
+end_loop:
+yield
+j loop

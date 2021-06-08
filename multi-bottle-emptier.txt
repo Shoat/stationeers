@@ -1,0 +1,44 @@
+# Multi bottle emptier
+
+# IC pins
+alias in_pipe_analyser1 d0
+alias out_gas_mixer1 d1
+alias in_pipe_analyser2 d2
+alias out_gas_mixer2 d3
+alias in_pipe_analyser3 d4
+alias out_gas_mixer3 d5
+
+# Internal Variables
+alias curr_pressure r0
+alias mixer_status r1
+
+# Main execution
+loop:
+
+# Read in pressure1
+l curr_pressure in_pipe_analyser1 Pressure
+jal function_mixer_status
+s out_gas_mixer1 On mixer_status
+# Read in pressure2
+l curr_pressure in_pipe_analyser2 Pressure
+jal function_mixer_status
+s out_gas_mixer2 On mixer_status
+# Read in pressure3
+l curr_pressure in_pipe_analyser2 Pressure
+jal function_mixer_status
+s out_gas_mixer2 On mixer_status
+
+yield
+j loop
+
+#function
+function_mixer_status:
+# If pressure <= 0, turn off mix
+bgtz curr_pressure on_mix
+move mixer_status 0
+j ra
+
+# else, turn on mix
+on_mix:
+move mixer_status 1
+j ra
