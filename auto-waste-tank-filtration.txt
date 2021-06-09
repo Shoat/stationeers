@@ -5,7 +5,7 @@ define max_pressure 1000
 define min_pressure 100
 
 # IC pins
-alias in_pipe_analyser d0
+alias in_waste_tank d0
 
 # Internal Variables
 define filtration -348054045
@@ -15,7 +15,7 @@ alias filtration_status r1
 # Main execution
 loop:
 # Read in pressure and status
-l curr_pressure in_pipe_analyser Pressure
+l curr_pressure in_waste_tank Pressure
 lb filtration_status filtration On 1
 
 # if the filtration is on
