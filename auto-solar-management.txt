@@ -9,7 +9,7 @@ alias in_daylight_sensor d0
 alias inout_generator d1
 alias out_warning_light d2
 
-define solar_panel_hash -2045627372
+define solar_panel_hash -539224550
 define station_battery_hash -400115994
 define lg_station_battery_hash -1388288459
 

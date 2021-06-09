@@ -23,14 +23,17 @@ l curr_pressure in_pipe_analyser1 Pressure
 jal function_mixer_status
 s out_gas_mixer1 On mixer_status
 # Read in pressure2
+bdns in_pipe_analyser2 end_loop
 l curr_pressure in_pipe_analyser2 Pressure
 jal function_mixer_status
 s out_gas_mixer2 On mixer_status
 # Read in pressure3
-l curr_pressure in_pipe_analyser2 Pressure
+bdns in_pipe_analyser3 end_loop
+l curr_pressure in_pipe_analyser3 Pressure
 jal function_mixer_status
-s out_gas_mixer2 On mixer_status
+s out_gas_mixer3 On mixer_status
 
+end_loop:
 yield
 j loop
 
